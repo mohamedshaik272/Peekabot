@@ -74,8 +74,15 @@ while cap.isOpened():
             x_max = min(frameWidth, x_max + padding)
             y_max = min(frameHeight, y_max + padding)
 
+            if y <= 750:
+                print("BOT COMMAND: GO FORWARD!")
+            print(f"X: {x}")
+            print(f"Y: {y}\n")
+
             # Draw the bounding box around the detected pose including the head
             cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
+        else:
+            print("ALERT: TARGET OUT OF FRAME!!!!!!")
 
         # Show the result in a window
         cv2.imshow("Pose Detection with Bounding Box Including Head", img)
