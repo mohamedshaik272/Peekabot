@@ -51,8 +51,7 @@ Peekabot is an innovative, cloud-connected robot that revolutionizes home safety
 
 Experience Peekabot in action! Scan the QR code below to access our live demo from your smartphone. Receive real-time updates and interact with Peekabot's interface to explore its capabilities.
 
-![Peekabot Demo QR Code](https://i.imgur.com/HDhXqpg.png)
-
+<img src="https://i.imgur.com/HDhXqpg.png" alt="Peekabot Demo QR Code" width="100" height="100">
 
 ---
 
