@@ -1,5 +1,6 @@
 import cv2
 import mediapipe as mp
+from distance_estimator import DistanceEstimator  # Add this line
 
 # Set up frame width and height
 frameWidth = 640
@@ -25,20 +26,23 @@ actual_height = cap.get(4)
 print(f"Actual width: {actual_width}")
 print(f"Actual height: {actual_height}")
 
+# Initialize DistanceEstimator
+distance_estimator = DistanceEstimator(frameWidth, frameHeight)
+
 previous_command = None  # To store the previous bot command
-go_forward_counter = 0  # Counter for consecutive frames where user is far away
-go_forward_threshold = 3  # Number of consecutive frames to trigger "GO FORWARD" command (lowered for sensitivity)
 
 while cap.isOpened():
     success, img = cap.read()
-    
     if success:
         # Convert the image to RGB for pose detection
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
+        
         # Perform pose detection
         results = pose.process(img_rgb)
-
+        
+        # Draw guide lines
+        img = distance_estimator.draw_guide(img)
+        
         # If a pose is detected, draw the pose landmarks on the image
         if results.pose_landmarks:
             mp_drawing.draw_landmarks(
@@ -46,79 +50,45 @@ while cap.isOpened():
                 mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=2),
                 mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2, circle_radius=2)
             )
-
+            
             # Get the list of landmarks
             landmarks = results.pose_landmarks.landmark
-
+            
             # Initialize variables to calculate the bounding box
-            x_min = frameWidth
-            y_min = frameHeight
-            x_max = 0
-            y_max = 0
-
+            x_min, y_min = frameWidth, frameHeight
+            x_max, y_max = 0, 0
+            
             # Iterate through all the pose landmarks to find the bounding box coordinates
             for landmark in landmarks:
-                x = int(landmark.x * frameWidth)
-                y = int(landmark.y * frameHeight)
-
-                # Update the min/max coordinates to include all pose landmarks
-                x_min = min(x_min, x)
-                y_min = min(y_min, y)
-                x_max = max(x_max, x)
-                y_max = max(y_max, y)
-
-            # Add some padding to the bounding box (optional, to ensure head is fully inside the box)
-            padding = 20  # Add some padding to make the box larger
+                x, y = int(landmark.x * frameWidth), int(landmark.y * frameHeight)
+                x_min, y_min = min(x_min, x), min(y_min, y)
+                x_max, y_max = max(x_max, x), max(y_max, y)
+            
+            # Add some padding to the bounding box
+            padding = 20
             x_min = max(0, x_min - padding)
             y_min = max(0, y_min - padding)
             x_max = min(frameWidth, x_max + padding)
             y_max = min(frameHeight, y_max + padding)
-
-            # Calculate the center of the bounding box
-            box_center_x = (x_min + x_max) // 2
-            box_center_y = (y_min + y_max) // 2
-
-            # Calculate the height of the bounding box
-            box_height = y_max - y_min
-
-            # Command logic based on the bounding box position and size
-            bot_command = None
-
-            # Check if the person is too close or too far based on bounding box height
-            if box_height > 300:  # Height threshold to determine if the user is too close
-                bot_command = "BOT COMMAND: GO BACK!"
-                go_forward_counter = 0  # Reset counter when person is too close
-            elif box_height < 250:  # Lower height threshold to make "GO FORWARD" more sensitive
-                go_forward_counter += 1
-                if go_forward_counter >= go_forward_threshold:
-                    bot_command = "BOT COMMAND: GO FORWARD!"
-                    go_forward_counter = 0  # Reset after issuing command
-            elif box_center_x > 450:  # Right of the frame
-                bot_command = "BOT COMMAND: GO RIGHT!"
-                go_forward_counter = 0  # Reset counter
-            elif box_center_x < 200:  # Left of the frame
-                bot_command = "BOT COMMAND: GO LEFT"
-                go_forward_counter = 0  # Reset counter
-            else:
-                go_forward_counter = 0  # Reset counter if no specific condition is met
-
-            # Print the command only if it changes
-            if bot_command and bot_command != previous_command:
+            
+            # Get command from DistanceEstimator
+            bot_command = distance_estimator.get_command(x_min, y_min, x_max, y_max)
+            
+            if bot_command != previous_command:
                 print(bot_command)
                 previous_command = bot_command
-
+            
             # Draw the bounding box around the detected pose
             cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
         else:
-            # Alert if target is out of frame
-            if previous_command != "ALERT: TARGET OUT OF FRAME!!!!!!":
-                print("ALERT: TARGET OUT OF FRAME!!!!!!")
-                previous_command = "ALERT: TARGET OUT OF FRAME!!!!!!"
-            go_forward_counter = 0  # Reset counter
-
+            bot_command = distance_estimator.get_command(0, 0, 0, 0)
+            if bot_command != previous_command:
+                print(bot_command)
+                previous_command = bot_command
+        
         # Show the result in a window
-        cv2.imshow("Pose Detection with Bounding Box Including Head", img)
-
+        cv2.imshow("Pose Detection with Distance Estimation", img)
+        
         # Break the loop if 'q' is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
