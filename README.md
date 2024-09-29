@@ -1,8 +1,4 @@
-### README.md
-
----
-
-# Peekabot: Your Intelligent Home Safety Companion
+# Peekabot: Peeka Peeka!
 
 **HackOverflow 2024 Project**
 
