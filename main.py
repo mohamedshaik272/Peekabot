@@ -75,7 +75,7 @@ while cap.isOpened():
             y_max = min(frameHeight, y_max + padding)
 
             if y <= 750:
-                print("BOT COMMAND: GO FORWARD!")
+                print("BOT COMMAND: GO BACK!")
             
             if x >= 390:
                 print("BOT COMMAND: GO RIGHT!")
