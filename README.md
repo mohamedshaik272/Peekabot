@@ -1,17 +1,58 @@
-# Peekabot: Smart Home Monitoring Robot
-For HackOverflow 2024
+# Peekabot: Peeka Peeka!
 
-## Overview:
-Peekabot is a cloud-connected robot built with Arduino and Raspberry Pi, designed to improve home safety. It tracks movement using vSLAM (Visual Simultaneous Localization and Mapping) and sends real-time alerts when potential dangers are detected, such as a toddler wandering into unsafe areas, an elderly person falling, or an intruder entering your home.
+**HackOverflow 2024 Project**
 
-## Features:
-- **vSLAM Tracking**: Real-time tracking of people and objects within the environment.
-- **Text Alerts**: Instantly notifies you via text if an issue arises (e.g., toddler in a danger zone, elderly fall, or home intrusion).
-- **Versatile Use**: Peekabot is designed for monitoring, but can act as your personal companion too. 
+## Overview
 
-## Future Features:
-- **Advanced AI Integration**: Predictive alerts to notify you before risky behavior occurs.
-- **Home Automation**: Seamless integration with other smart home devices like lights and locks.
+Peekabot is an innovative, cloud-connected robot that revolutionizes home safety. Built on Arduino and Raspberry Pi platforms, it utilizes advanced motion tracking technology to monitor your home environment. Peekabot provides real-time alerts for various scenarios, from child safety to elderly care and home security.
 
-## Demo:
-**See our application live!** Just scan the QR code and access it from your phone. You'll receive live updates and feedback from Peekabot about its status and surroundings.
+## Key Features
+
+- **Advanced Motion Tracking**: Utilizes state-of-the-art technology to track movement of people and objects in real-time.
+- **Instant Alerts**: Sends immediate text notifications for critical situations (e.g., toddler in danger, elderly falls, potential intruders).
+- **Multi-Purpose Design**: Adaptable for child monitoring, elderly care, and home security.
+- **Remote Access**: Cloud connectivity allows you to check on your home from anywhere.
+
+## Technical Specifications
+
+- **Hardware**: 
+  - Arduino microcontroller
+  - Raspberry Pi computer
+  - 4 high-precision motors for mobility
+  - Custom-designed circuit board for seamless integration
+
+- **Software**:
+  - OpenCV and Mediapipe
+  - Local web server for remote access
+  - Cloud-based alert system
+
+## How Peekabot Works
+
+1. **Environment Scanning**: Continuously monitors the designated area using advanced sensors.
+2. **Data Processing**: Analyzes collected data in real-time to identify potential risks or unusual activities.
+3. **Alert Generation**: Instantly creates and sends text alerts when predefined safety thresholds are crossed.
+4. **Remote Monitoring**: Allows users to check in and control Peekabot from anywhere via a secure web interface.
+
+## Use Cases
+
+| Scenario | Application |
+|----------|-------------|
+| Child Safety | Alerts parents if toddlers enter unsafe areas |
+| Elderly Care | Detects falls and sends emergency notifications |
+| Home Security | Monitors for intruders and can alert authorities |
+
+## Future Enhancements
+
+- **AI-Powered Predictive Alerts**: Anticipate and notify users of potential risks before they occur.
+- **Smart Home Integration**: Seamlessly connect with other IoT devices for a comprehensive home automation experience.
+- **Customizable Behavior Patterns**: Allow users to define specific monitoring rules tailored to their unique needs.
+
+## Live Demo
+
+Experience Peekabot in action! Scan the QR code below to access our live demo from your smartphone. Receive real-time updates and interact with Peekabot's interface to explore its capabilities.
+
+[QR Code Placeholder]
+
+---
+
+*Peekabot: Keeping an eye on what matters most, so you don't have to.*
