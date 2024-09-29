@@ -25,6 +25,10 @@ actual_height = cap.get(4)
 print(f"Actual width: {actual_width}")
 print(f"Actual height: {actual_height}")
 
+previous_command = None  # To store the previous bot command
+go_forward_counter = 0  # Counter for consecutive frames where user is far away
+go_forward_threshold = 3  # Number of consecutive frames to trigger "GO FORWARD" command (lowered for sensitivity)
+
 while cap.isOpened():
     success, img = cap.read()
     
@@ -57,15 +61,11 @@ while cap.isOpened():
                 x = int(landmark.x * frameWidth)
                 y = int(landmark.y * frameHeight)
 
-                # Update the min/max coordinates to include the head and body landmarks
-                if x < x_min:
-                    x_min = x
-                if y < y_min:
-                    y_min = y
-                if x > x_max:
-                    x_max = x
-                if y > y_max:
-                    y_max = y
+                # Update the min/max coordinates to include all pose landmarks
+                x_min = min(x_min, x)
+                y_min = min(y_min, y)
+                x_max = max(x_max, x)
+                y_max = max(y_max, y)
 
             # Add some padding to the bounding box (optional, to ensure head is fully inside the box)
             padding = 20  # Add some padding to make the box larger
@@ -74,22 +74,47 @@ while cap.isOpened():
             x_max = min(frameWidth, x_max + padding)
             y_max = min(frameHeight, y_max + padding)
 
-            if y <= 750:
-                print("BOT COMMAND: GO BACK!")
-            
-            if x >= 390:
-                print("BOT COMMAND: GO RIGHT!")
+            # Calculate the center of the bounding box
+            box_center_x = (x_min + x_max) // 2
+            box_center_y = (y_min + y_max) // 2
 
-            if x <= 250:
-                print("BOT COMMAND GO LEFT")
+            # Calculate the height of the bounding box
+            box_height = y_max - y_min
 
-            print(f"X: {x}")
-            print(f"Y: {y}\n")
+            # Command logic based on the bounding box position and size
+            bot_command = None
 
-            # Draw the bounding box around the detected pose including the head
+            # Check if the person is too close or too far based on bounding box height
+            if box_height > 300:  # Height threshold to determine if the user is too close
+                bot_command = "BOT COMMAND: GO BACK!"
+                go_forward_counter = 0  # Reset counter when person is too close
+            elif box_height < 250:  # Lower height threshold to make "GO FORWARD" more sensitive
+                go_forward_counter += 1
+                if go_forward_counter >= go_forward_threshold:
+                    bot_command = "BOT COMMAND: GO FORWARD!"
+                    go_forward_counter = 0  # Reset after issuing command
+            elif box_center_x > 450:  # Right of the frame
+                bot_command = "BOT COMMAND: GO RIGHT!"
+                go_forward_counter = 0  # Reset counter
+            elif box_center_x < 200:  # Left of the frame
+                bot_command = "BOT COMMAND: GO LEFT"
+                go_forward_counter = 0  # Reset counter
+            else:
+                go_forward_counter = 0  # Reset counter if no specific condition is met
+
+            # Print the command only if it changes
+            if bot_command and bot_command != previous_command:
+                print(bot_command)
+                previous_command = bot_command
+
+            # Draw the bounding box around the detected pose
             cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
         else:
-            print("ALERT: TARGET OUT OF FRAME!!!!!!")
+            # Alert if target is out of frame
+            if previous_command != "ALERT: TARGET OUT OF FRAME!!!!!!":
+                print("ALERT: TARGET OUT OF FRAME!!!!!!")
+                previous_command = "ALERT: TARGET OUT OF FRAME!!!!!!"
+            go_forward_counter = 0  # Reset counter
 
         # Show the result in a window
         cv2.imshow("Pose Detection with Bounding Box Including Head", img)
