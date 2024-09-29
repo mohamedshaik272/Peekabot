@@ -76,6 +76,13 @@ while cap.isOpened():
 
             if y <= 750:
                 print("BOT COMMAND: GO FORWARD!")
+            
+            if x >= 390:
+                print("BOT COMMAND: GO RIGHT!")
+
+            if x <= 250:
+                print("BOT COMMAND GO LEFT")
+
             print(f"X: {x}")
             print(f"Y: {y}\n")
 
