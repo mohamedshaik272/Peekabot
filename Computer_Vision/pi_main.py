@@ -32,8 +32,8 @@ print(f"Actual height: {actual_height}")
 distance_estimator = DistanceEstimator(frameWidth, frameHeight)
 
 # Initialize serial communication with both Arduinos
-arduino1 = serial.Serial('/dev/ttyACM0', 9600, timeout=1)  # Replace with correct port for Arduino 1 (front wheels)
-arduino2 = serial.Serial('/dev/ttyACM1', 9600, timeout=1)  # Replace with correct port for Arduino 2 (back wheels)
+arduino1 = serial.Serial('/dev/ttyACM0', 9600, timeout=1)  # Arduino 1 (front wheels)
+arduino2 = serial.Serial('/dev/ttyACM1', 9600, timeout=1)  # Arduino 2 (back wheels)
 
 time.sleep(2)  # Wait for the serial connection to establish
 
@@ -46,11 +46,24 @@ def send_command_to_arduinos(command):
         send_command(arduino1, "BACKWARD")
         send_command(arduino2, "BACKWARD")
     elif command & 4:  # Bit 2 - "turn left"
-        send_command(arduino1, "FORWARD")  # Front wheels move forward to help turn left
-        send_command(arduino2, "BACKWARD")  # Back wheels move backward to help turn left
+        send_command(arduino1, "FORWARD")  # Front wheels go forward
+        send_command(arduino2, "BACKWARD")  # Back wheels go backward
     elif command & 8:  # Bit 3 - "turn right"
-        send_command(arduino1, "BACKWARD")  # Front wheels move backward to help turn right
-        send_command(arduino2, "FORWARD")  # Back wheels move forward to help turn right
+        send_command(arduino1, "BACKWARD")  # Front wheels go backward
+        send_command(arduino2, "FORWARD")  # Back wheels go forward
+    elif command & 16:  # Bit 4 - "move front-left (diagonal)"
+        send_command(arduino1, "FORWARD")  # Front wheels move forward slowly
+        send_command(arduino2, "FORWARD")  # Back wheels move forward
+    elif command & 32:  # Bit 5 - "move front-right (diagonal)"
+        send_command(arduino1, "FORWARD")  # Front wheels move forward
+        send_command(arduino2, "FORWARD")  # Back wheels move forward slowly
+    elif command & 64:  # Bit 6 - "target out of range"
+        if last_direction == "left":
+            send_command(arduino1, "FORWARD")
+            send_command(arduino2, "BACKWARD")
+        elif last_direction == "right":
+            send_command(arduino1, "BACKWARD")
+            send_command(arduino2, "FORWARD")
     elif command & 128:  # Bit 7 - "stay"
         send_command(arduino1, "STOP")
         send_command(arduino2, "STOP")
@@ -65,6 +78,7 @@ def send_command(arduino, command):
 
 # Main loop for pose detection and Arduino signaling
 previous_command = 0  # To store the previous bot command
+last_direction = "right"  # Default initial direction
 
 try:
     while cap.isOpened():
