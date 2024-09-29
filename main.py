@@ -29,7 +29,25 @@ print(f"Actual height: {actual_height}")
 # Initialize DistanceEstimator
 distance_estimator = DistanceEstimator(frameWidth, frameHeight)
 
-previous_command = None  # To store the previous bot command
+previous_command = 0  # To store the previous bot command
+
+# Function to convert command bits to human-readable text
+def get_command_description(command):
+    descriptions = []
+    if command & 1:
+        descriptions.append("go forward")
+    if command & 2:
+        descriptions.append("go back")
+    if command & 4:
+        descriptions.append("turn left")
+    if command & 8:
+        descriptions.append("turn right")
+    if command & 16:
+        descriptions.append("target out of range")
+    if command & 128:
+        descriptions.append("stay")
+    
+    return ", ".join(descriptions) if descriptions else "no action"
 
 while cap.isOpened():
     success, img = cap.read()
@@ -62,7 +80,8 @@ while cap.isOpened():
             for landmark in landmarks:
                 x, y = int(landmark.x * frameWidth), int(landmark.y * frameHeight)
                 x_min, y_min = min(x_min, x), min(y_min, y)
-                x_max, y_max = max(x_max, x), max(y_max, y)
+                x_max = max(x_max, x)
+                y_max = max(y_max, y)
             
             # Add some padding to the bounding box
             padding = 20
@@ -74,16 +93,28 @@ while cap.isOpened():
             # Get command from DistanceEstimator
             bot_command = distance_estimator.get_command(x_min, y_min, x_max, y_max)
             
+            # Send command only if it is different from previous one
             if bot_command != previous_command:
-                print(bot_command)
+                # Print the command in both bit and text form
+                command_bits = bin(bot_command)
+                command_description = get_command_description(bot_command)
+                print(f"Command as bits: {command_bits} | Description: {command_description}")
+                
+                # Update previous command
                 previous_command = bot_command
             
             # Draw the bounding box around the detected pose
             cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (255, 0, 0), 2)
         else:
+            # If the target is out of the frame
             bot_command = distance_estimator.get_command(0, 0, 0, 0)
             if bot_command != previous_command:
-                print(bot_command)
+                # Print the command in both bit and text form
+                command_bits = bin(bot_command)
+                command_description = get_command_description(bot_command)
+                print(f"Command as bits: {command_bits} | Description: {command_description}")
+                
+                # Update previous command
                 previous_command = bot_command
         
         # Show the result in a window
