@@ -1,4 +1,4 @@
-# Peekabot: Peeka Peeka!
+# Peekabot: Your Intelligent Home Safety Companion
 
 **HackOverflow 2024 Project**
 
@@ -16,10 +16,10 @@ Peekabot is an innovative, cloud-connected robot that revolutionizes home safety
 ## Technical Specifications
 
 - **Hardware**: 
-  - Arduino microcontroller
-  - Raspberry Pi computer
-  - 4 high-precision motors for mobility
-  - Custom-designed circuit board for seamless integration
+  - Arduino Uno R3
+  - Raspberry Pi 4
+  - 4 motors for mobility
+  - Circuit board for integration
 
 - **Software**:
   - OpenCV and Mediapipe
@@ -51,7 +51,7 @@ Peekabot is an innovative, cloud-connected robot that revolutionizes home safety
 
 Experience Peekabot in action! Scan the QR code below to access our live demo from your smartphone. Receive real-time updates and interact with Peekabot's interface to explore its capabilities.
 
-[QR Code Placeholder]
+<img src="https://i.imgur.com/HDhXqpg.png" alt="Peekabot Demo QR Code" width="100" height="100">
 
 ---
 
