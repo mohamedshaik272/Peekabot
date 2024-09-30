@@ -1,7 +1,3 @@
-### README.md
-
----
-
 # Peekabot AWS Integration and Live Feed
 
 ## Overview

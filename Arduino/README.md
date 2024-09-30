@@ -1,7 +1,3 @@
-### README.md
-
----
-
 # Peekabot Arduino Control
 
 ## Overview
